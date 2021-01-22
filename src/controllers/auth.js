@@ -14,7 +14,7 @@ exports.signup = (req, res) => {
       //create an account
       const {firstName, lastName, email, password, role } = req.body;
       const hash_password = await bcrpt.hash(password, salt);
-      if(role === 'teacher' || role === undefined){
+      if(role === 'teacher'){
         const _user  = new User({
           firstName,
           lastName,
@@ -26,14 +26,14 @@ exports.signup = (req, res) => {
         saveAccount(_user, res, role);
       }
 
-      if(role === 'coordinator'){
+      if(role === 'director'){
         const _user  = new User({
           firstName,
           lastName,
           email,
           hash_password,
           userName: `${firstName}.${lastName}`,
-          role: 'coordinator'
+          role: 'director'
         });
         saveAccount(_user, res, role);
       }
@@ -58,6 +58,7 @@ const saveAccount = (_user, res, role) => {
   if(error) return res.status(400).json({
     message: `something went wrong:${error}`
   })
+  if(!role) role="Teacher"
   if(data) return res.status(201).json({
     message: `${role} is registered successfuly..!`
     })
@@ -69,9 +70,10 @@ exports.signin = (req, res) => {
     User.findOne({email: req.body.email})
     .exec((error, user) => {
       if(!user) return res.status(409).json({message: `Sorry!, this email doesn't exists`})
-
-      if(user){
+      
+      if(user) {
         if(user.authenticate(req.body.password)){
+          console.log(user._id, user.role)
           const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRETE, 
             {expiresIn: '1d'});
           res.cookie('token', token, {expiresIn: '1d'})

@@ -55,7 +55,7 @@ const teacherSchema = new mongoose.Schema({
   phoneNumber: String,
 }, {timestampts: true})
 
-studentSchema.virtual('fullName')
+teacherSchema.virtual('fullName')
 .get(function(){
   return `${this.firstName} ${this.middleName} ${this.lastName}`;
 });

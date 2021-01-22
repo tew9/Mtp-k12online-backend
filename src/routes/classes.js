@@ -9,18 +9,7 @@ const { fetchStudents,
         approveStudent
       } = require('../controllers/students');
 const { requireSignin, adminMiddleware } = require('../common-ware');
-const { studentValidation } = require('../validators/validators');
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(path.dirname(__dirname), 'uploads'))
-  },
-  filename: function (req, file, cb) {
-    cb(null, shortid.generate() +' '+file.originalname)
-  }
-})
-
-var upload = multer({ storage: storage })
+const { classValidation, isRequestValidatedClass } = require('../validators/classValidator');
 
 //router.get('/class/get/:title',  fetchStudent);
 router.get('/class/get', fetchStudents);

@@ -9,8 +9,8 @@ const { fetchStudents,
         deleteStudent,
         approveStudent
       } = require('../controllers/students');
-const { requireSignin, adminMiddleware , adminTeacherMiddleware } = require('../common-ware');
-const { studentValidation } = require('../validators/students');
+const { requireSignin, adminTeacherMiddleware } = require('../common-ware');
+const { studentValidation, isRequestValidatedStudent } = require('../validators/studentValidator');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -25,7 +25,8 @@ var upload = multer({ storage: storage })
 
 // router.get('/student/get/:lastName',  fetchStudent);
 router.get('/student/get', requireSignin, adminTeacherMiddleware, fetchStudents);
-router.post('/student/register', requireSignin, studentValidation, upload.single('studentPicture'), registerStudent);
+router.post('/student/register', studentValidation, isRequestValidatedStudent,
+                                 upload.single('studentPicture'), registerStudent);
 //router.put('/student/approval', requireSignin, adminMiddleware, approveStudent);
 //router.delete('/student/delete/:_id', requireSignin, adminMiddleware, deleteStudent);
 

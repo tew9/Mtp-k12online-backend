@@ -10,9 +10,13 @@ exports.validateRequestSignup = [
   check('email')
   .notEmpty()
   .withMessage('email is required'),
+  check('role')
+  .notEmpty()
+  .withMessage('role is required, like director, teacher or student'),
   check('password')
-  .isLength({ min: 6 }).withMessage('must be at least 6 chars long')
+  .isLength({ min: 6 }).withMessage('password is required and it must be at least 6 chars long')
   .matches(/\d/).withMessage('must contain a number')
+  .matches(/[A-Z]/).withMessage('must contain at least one Uppercase')
 ]
 
 exports.isRequestValidatedSignup = (req, res, next) => {

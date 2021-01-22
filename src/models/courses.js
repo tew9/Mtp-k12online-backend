@@ -10,8 +10,8 @@ const courseSchema = new mongoose.Schema({
     min: 1,
     max:12
   },
-  period: { type: string },
-  time: { type: timestampts},
+  periodStarts: { type: Number },
+  periodEnds: { type: Number},
   teachers: {
     type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Teachers'}],
     trim: true,

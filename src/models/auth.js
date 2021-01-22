@@ -40,8 +40,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'teacher', 'coordinator'],
-    default: 'student',
+    required: true,
+    enum: ['student', 'teacher', 'director'],
   },
   cantactNumber: String,
   profilePicture: String
@@ -55,7 +55,7 @@ userSchema.virtual('fullName')
 userSchema.methods = {
   authenticate: async function(password){
      return await bcrypt.compare(password, this.hash_password);
-    }
+  }
 }
 
 module.exports = mongoose.model('Users', userSchema);

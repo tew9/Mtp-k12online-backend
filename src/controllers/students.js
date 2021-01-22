@@ -1,4 +1,5 @@
 const studentModel =  require('../models/students');
+const ID = require("nodejs-unique-numeric-id-generator")
 const slugify = require('slugify');
 
 /**
@@ -20,15 +21,28 @@ exports.approveStudent = (req, res) => {
 }
 
 exports.registerStudent = (req, res) => {
-  const {firstName, lastName, middleName, dob, contacts, address} = req.body;
+  const { firstName, lastName, middleName,
+          gender, email, cellPhone, city, county, country, } = req.body;
+
+  var { dob }  = req.body;
+  dob = new Date(dob);
+  enrolledDate = new Date()
+    
+  var studentId = ID.generate(new Date().toJSON());
   let studentImageUrl
   const studentObject = {
+    slug: slugify(firstName+lastName+dob),
     firstName,
     lastName,
     middleName,
-    addresses, 
-    contacts,
-    ID: slugify(`${firstName}${lastName}${dob}`),
+    email,
+    gender,
+    cellPhone,
+    city,
+    country,
+    county,
+    dob,
+    ID: studentId,
     studentImage: studentImageUrl
   }
 
@@ -37,6 +51,7 @@ exports.registerStudent = (req, res) => {
   }
 
   const student = new studentModel(studentObject);
+ 
   student.save((error, students)=>{
     error? res.status(400).json({error: error})
     : res.status(201).json({ students })
