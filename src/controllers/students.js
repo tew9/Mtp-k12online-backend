@@ -21,6 +21,7 @@ exports.approveStudent = (req, res) => {
 }
 
 exports.registerStudent = (req, res) => {
+
   const { firstName, lastName, middleName,
           gender, email, cellPhone, city, county, country, } = req.body;
 

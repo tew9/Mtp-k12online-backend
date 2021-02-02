@@ -29,7 +29,6 @@ exports.studentValidation = [
   check('email')
   .notEmpty()
   .withMessage('email address is required'),
- 
 ]
 
 exports.isRequestValidatedStudent = (req, res, next) => {
