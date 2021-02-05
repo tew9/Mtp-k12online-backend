@@ -37,3 +37,6 @@ To learn Node Js, check out the [Node Js](https://nodejs.org/en/).
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
+## Contribution
+### If one want to contribute to this open source project, few things one will need to consider are below.
+- Once you clonned the project as described above or from it's remote [Github Repository](https://github.com/tew9/Mtp-k12online-backend.git).
