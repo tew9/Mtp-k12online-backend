@@ -30,7 +30,6 @@ const teacherSchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
-  approval: { type: Boolean, default: false},
   role: {
     type: String,
     default: 'teacher',
@@ -44,15 +43,17 @@ const teacherSchema = new mongoose.Schema({
     trim: true,
     min: 1
   },
-  address: {type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Addresses', required:true}]},
-  contacts:{type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Contacts', required:true}]},
+  country: { type: String, required: true, trim: true },
+  county: { type: String, required: true, trim: true },
+  city: { type: String, required: true, trim: true },
+  state: { type: String, required: true, trim: true },
+  cellPhone: { type: String, trim: true },
   occupation: {
     type: String,
     trim: true,
     required: true
   },
   profilePicture: {type: String},
-  phoneNumber: String,
 }, {timestampts: true})
 
 teacherSchema.virtual('fullName')

@@ -1,11 +1,12 @@
 {
-  "name": "mtp-api",
-  "version": "1.0.0",
+  "name": "mtp-k12oline-api",
+  "version": "0.0.1",
   "description": "This is the backend api for all the basic mtp-activities for tutoring.",
   "main": "server.js",
   "scripts": {
     "test": "npm test",
-    "start": "nodemon ./src/server.js"
+    "start": "nodemon ./src/server.js",
+    "build": "npm build"
   },
   "repository": {
     "type": "git",

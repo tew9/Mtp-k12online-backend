@@ -3,13 +3,19 @@ const { check, validationResult } = require('express-validator');
 exports.teacherValidation = [
   check('firstName')
   .notEmpty()
-  .withMessage('firstName is required'),
+  .withMessage('firstName is required, Please enter it as "firstName" '),
   check('lastName')
   .notEmpty()
-  .withMessage('lastName is required'),
-  check('address')
+  .withMessage('lastName is required, Please enter it as "lastName"'),
+  check('gender')
   .notEmpty()
-  .withMessage('Please enter your address, atleast city, state and country'),
+  .withMessage('gender is required, Please enter it as "gender"'),
+  check('dob')
+  .notEmpty()
+  .withMessage('date of birth is required, Please enter it as "dob"'),
+  check('email')
+  .notEmpty()
+  .withMessage('date of birth is required, Please enter it as "dob"'),
   check('contact')
   .notEmpty()
   .withMessage('Please enter your contacts, atlease email or phone number')
