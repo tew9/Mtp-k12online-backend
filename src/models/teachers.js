@@ -34,14 +34,68 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     default: 'teacher',
   },
-  dob: {
-    type: Date
-  },
+
   gender: {
+    type: String,
+    trim: true,
+    min: 3,
+    max: 7,
+    require: true
+  },
+  dob: {
+    type: Date,
+    required: true,
+    trim: true
+  },
+  email:{
     type: String,
     required: true,
     trim: true,
-    min: 1
+    min: 1,
+    max:30
+  },
+  cellPhone:{
+    type: String,
+    trim: true,
+    unique: true,
+    min: 10,
+    max:15
+  },
+  city:{
+    type: String,
+    required: true,
+    trim: true,
+    min: 1,
+    max:30
+  },
+  county:{
+    type: String,
+    required: true,
+    trim: true,
+    min: 1,
+    max:30
+  },
+  country: {
+    type: String,
+    trim: true,
+    minlength: 3,
+    default: "Ethiopia"
+  },
+  location: {
+    type: String,
+    trim: true,
+    minlength: 3,
+  },
+  state: {
+    require: true,
+    type: String,
+    trim: true,
+    minlength: 2,
+  },
+  zipCode: {
+    type: String,
+    trim: true,
+    minlength: 3,
   },
   country: { type: String, required: true, trim: true },
   county: { type: String, required: true, trim: true },

@@ -7,15 +7,25 @@ const slugify = require('slugify');
 **/
 
 exports.registerTeacher = (req, res) => {
-  const {firstName, lastName, middleName, contacts, addresses } = req.body;
+  const {firstName, lastName, middleName, dob, gender, email, cellPhone,
+         county, country, state, city, zipCode,   } = req.body;
+
+  dob = new Date(dob);
   let ImageUrl
   const teacherObject = {
     firstName,
     lastName,
     middleName,
-    contacts,
-    addresses,
-    slug: slugify(`${firstName} ${middleName} ${lastName}`),
+    dob,
+    gender,
+    cellPhone,
+    zipCode,
+    email,
+    country,
+    county,
+    city,
+    state,
+    slug: slugify(`${firstName}${lastName}${dob}`),
     profilePicture: ImageUrl
   }
 
@@ -24,7 +34,7 @@ exports.registerTeacher = (req, res) => {
   }
 
   const teacher = new teacherModel(teacherObject);
-  teacher.save((error, teachers)=>{
+  teacher.save((error, teachers)=> {
     error? res.status(400).json({error: error})
     : res.status(201).json({ teachers })
   });

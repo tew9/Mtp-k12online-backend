@@ -35,6 +35,7 @@ mongoose.connect(
 app.use(cors());
 //app.use('/public', express.static(path.join(__dirname, 'uploads')))
 app.use(bodyParser.json())
+
 app.use('/api', userRoutes)
 app.use('/api', studentRoutes)
 app.use('/api', courseRoutes)
