@@ -25,9 +25,6 @@ exports.teacherValidation = [
   check('state')
   .notEmpty()
   .withMessage('state/Province is required, Please enter it as "state".'),
-  check('country')
-  .notEmpty()
-  .withMessage('country is required, Please enter it as "country".'),
   check('occupation')
   .notEmpty()
   .withMessage('occupation or your position(goverment, self-employed, NGO, student) is required, Please enter it as "occupation".'),

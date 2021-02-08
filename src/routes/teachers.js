@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const shortid = require('shortid');
-//const multer = require('multer');
+const multer = require('multer');
 
 const { fetchTeachers,
         fetchTeacher,
@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
   }
 })
 
-//var upload = multer({ storage: storage })
+var upload = multer({ storage: storage })
 
 // router.get('/teacher/get/:lastName',  fetchStudent);
 router.get('/teacher/get', requireSignin, adminTeacherMiddleware, fetchTeachers);

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 //create schema
-const teacherSchema = new mongoose.Schema({
+const TeacherSchema = new mongoose.Schema({
   slug: {type: String, required: true, unique: true},
   firstName:{
     type: String,
@@ -76,7 +76,6 @@ const teacherSchema = new mongoose.Schema({
   },
   location: {
     type: String,
-    required: true,
     trim: true,
     minlength: 3,
   },
@@ -100,9 +99,9 @@ const teacherSchema = new mongoose.Schema({
   profilePicture: {type: String},
 }, {timestampts: true})
 
-teacherSchema.virtual('fullName')
+TeacherSchema.virtual('fullName')
 .get(function(){
   return `${this.firstName} ${this.middleName} ${this.lastName}`;
 });
 
-module.exports = mongoose.model('Teachers', teacherSchema);
+module.exports = mongoose.model('Teachers', TeacherSchema);

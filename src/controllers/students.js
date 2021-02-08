@@ -1,4 +1,4 @@
-const studentModel =  require('../models/students');
+const StudentModel =  require('../models/students');
 const ID = require("nodejs-unique-numeric-id-generator")
 const slugify = require('slugify');
 
@@ -12,8 +12,7 @@ exports.approveStudent = (req, res) => {
   var query = { approval: false};
   if(approval){
     var newValue = { $set: { approval: true } }
-    console.log(newValue)
-    studentModel.updateOne(query, newValue, function(err, response){
+    StudentModel.updateOne(query, newValue, function(err, response){
       if(!response.result) res.status(500).json({"Update failed!!! ": err});
       if(response.result) res.status(200).json(response.result.nModified)
     });
@@ -51,13 +50,20 @@ exports.registerStudent = (req, res) => {
     studentObject.studentImage = process.env.API+'/public/'+req.file.filename
   }
 
-  const student = new studentModel(studentObject);
- 
-  student.save((error, students)=>{
-    error? res.status(400).json({error: error})
-    : res.status(201).json({ students })
+  const student = new StudentModel(studentObject);
+  StudentModel.findOne({email: req.body.email})
+  .exec((error, stu) => {
+    if(stu)
+      res.status(409).json({"error": `Student with email ${req.body.email} has already been registered.`})
+    else {
+      student.save((error, students)=>{
+        error? res.status(400).json({error: error})
+        : res.status(201).json({ students })
+      });
+    }
   });
 }
+  
 
 exports.fetchStudents = (req, res) => {
   studentModel.find({})

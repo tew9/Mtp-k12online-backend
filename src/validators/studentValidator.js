@@ -23,9 +23,6 @@ exports.studentValidation = [
   check('state')
   .notEmpty()
   .withMessage('State/Province is required'),
-  check('country')
-  .notEmpty()
-  .withMessage('Country is required'),
   check('email')
   .notEmpty()
   .withMessage('email address is required'),
