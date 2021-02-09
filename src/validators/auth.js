@@ -13,6 +13,9 @@ exports.validateRequestSignup = [
   check('role')
   .notEmpty()
   .withMessage('role is required, like director, teacher or student'),
+  check('dob')
+  .notEmpty()
+  .withMessage('date of birth is required, like director, enter it as dob'),
   check('password')
   .isLength({ min: 6 }).withMessage('password is required and it must be at least 6 chars long')
   .matches(/\d/).withMessage('must contain a number')

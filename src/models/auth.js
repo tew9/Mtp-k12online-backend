@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 var salt = 10;
 //create schema
 const userSchema = new mongoose.Schema({
+  slug: {type: String, required: true, unique: true},
   firstName:{
     type: String,
     required: true,
@@ -33,6 +34,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     unique: true,
+  },
+  dob: {
+    type: Date,
+    required: true
   },
   hash_password: {
     type: String,

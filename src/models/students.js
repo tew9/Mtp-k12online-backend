@@ -38,7 +38,8 @@ const StudentSchema = new mongoose.Schema({
     type: Date,
   },
   dob: {
-    type: Date
+    type: Date,
+    required:true
   },
   email:{
     type: String,
