@@ -8,28 +8,28 @@ exports.requireSignin = (req, res, next) => {
     next();
   }
   else {
-    res.status(400).json({Access_Denied: "You must signin first"})
+    res.status(403).json({Access_Denied: "You must signin first"})
   }
 }
 
 //middleware to instersect student registration to only the admin
 exports.adminMiddleware = (req, res, next) => {
-  if(req.user && req.user.role !== 'coordinator'){
-    return res.status(400).json({message: "UnAuthorized access, SignIn as coordinator!"})
+  if(req.user && req.user.role !== 'director'){
+    return res.status(401).json({message: "UnAuthorized access, SignIn as coordinator/director!"})
   }
   next();
 }
 
 exports.adminTeacherMiddleware = (req, res, next) => {
-  if(req.user && req.user.role !== 'coordinator' && req.user && req.user.role !== 'teacher'){
-    return res.status(400).json({message: "UnAuthorized Access, You need to be Authorized, Signin as Teacher or Director!"})
+  if(req.user && req.user.role !== 'director' && req.user && req.user.role !== 'teacher'){
+    return res.status(401).json({message: "UnAuthorized Access, You need to be Authorized, Signin as Teacher or Director!"})
   }
   next();
 }
 
 exports.studentMiddleware = (req, res, next) => {
   if(req.user.role !== 'student'){
-    return res.status(400).json({message: "You need to be Authorized!"})
+    return res.status(401).json({message: "You need to be Authorized!"})
   }
   next();
 }

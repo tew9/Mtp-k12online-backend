@@ -75,7 +75,7 @@ exports.registerStudent = (req, res) => {
   
 
 exports.fetchStudents = (req, res) => {
-  studentModel.find({})
+  StudentModel.find({})
   .exec((error, students) => {
     if(students){
       res.status(200).json({students})
@@ -88,7 +88,7 @@ exports.fetchStudents = (req, res) => {
 
 exports.fetchStudent = (req, res) => {
   if(req.params.fullName !== undefined){
-    studentModel.find({slug: req.params.fullName.replace(/ /g,"-")})
+    StudentModel.find({slug: req.params.fullName.replace(/ /g,"-")})
     .exec((error, students) => {
       if(students){
         res.status(200).json({students})
@@ -105,13 +105,13 @@ exports.fetchStudent = (req, res) => {
 }
 
 exports.deleteStudent = (req, res) => {
-  studentModel.findOne({_id: req.params._id})
+  StudentModel.findOne({_id: req.params._id})
   .exec((err, student) => {
     if(student){
-      studentModel.deleteOne({_id: student._id})
+      StudentModel.deleteOne({_id: student._id})
       .exec((error, response) => {
         if(response) {
-          res.status(200).json({response: {"deleted":"true"}})
+          res.status(200).json({response: {"student": student, "deleted":"true"}})
         }
         else {
           res.status(400).json({error})

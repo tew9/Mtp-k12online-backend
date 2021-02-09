@@ -95,7 +95,7 @@ exports.deleteTeacher = (req, res) => {
       TeacherModel.deleteOne({_id: teacher._id})
       .exec((error, response) => {
         if(response) {
-          res.status(200).json({response: {"deleted":"true"}})
+          res.status(200).json({teacher: teacher, response: {"deleted":"true"}})
         }
         else {
           res.status(400).json({error})
