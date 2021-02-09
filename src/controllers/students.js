@@ -29,9 +29,11 @@ exports.registerStudent = (req, res) => {
   enrolledDate = new Date()
     
   var studentId = ID.generate(new Date().toJSON());
-  let studentImageUrl
+  var slug = slugify(firstName+lastName+dob);
+  var studentImageUrl
+
   const studentObject = {
-    slug: slugify(firstName+lastName+dob),
+    slug: slug,
     firstName,
     lastName,
     middleName,
@@ -52,14 +54,21 @@ exports.registerStudent = (req, res) => {
 
   const student = new StudentModel(studentObject);
   StudentModel.findOne({email: req.body.email})
-  .exec((error, stu) => {
-    if(stu)
+  .exec((error, std) => {
+    if(std)
       res.status(409).json({"error": `Student with email ${req.body.email} has already been registered.`})
     else {
-      student.save((error, students)=>{
-        error? res.status(400).json({error: error})
-        : res.status(201).json({ students })
-      });
+      StudentModel.findOne({slug: slug})
+      .exec((error, stdnt) => {
+        if(stdnt)
+          res.status(409).json({"error": `A Student with this name ${req.body.firstName} ${req.body.lastName} already exists`})
+        else{
+          student.save((error, students)=>{
+            error? res.status(400).json({error: error})
+            : res.status(201).json({ students })
+          });
+        }
+      })
     }
   });
 }

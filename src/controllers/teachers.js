@@ -12,6 +12,7 @@ exports.registerTeacher = (req, res) => {
 
   var { dob }  = req.body;
   dob = new Date(dob);
+  const ID = slugify(`${firstName}${lastName}${dob}`)
   let ImageUrl
   const teacherObject = {
     firstName,
@@ -27,7 +28,7 @@ exports.registerTeacher = (req, res) => {
     county,
     city,
     state,
-    slug: slugify(`${firstName}${lastName}${dob}`),
+    slug: ID,
     profilePicture: ImageUrl
   }
 
@@ -35,15 +36,22 @@ exports.registerTeacher = (req, res) => {
     teacherObject.teacherImage = process.env.API+'/public/'+req.file.filename
   }
 
-  const teacher = new TeacherModel(teacherObject);
+  const teacherMod = new TeacherModel(teacherObject);
   TeacherModel.findOne({email: req.body.email})
   .exec((error, teacher) => {
     if(teacher)
-    res.status(409).json({"error": `A Teacher with email ${req.body.email} already exists`})
+      res.status(409).json({"error": `A Teacher with email ${req.body.email} already exists`})
     else{
-      teacher.save((error, teachers)=> {
-        error? res.status(400).json({error: error})
-        : res.status(201).json({ teachers })
+      TeacherModel.findOne({slug: ID})
+      .exec((error, result) => {
+        if(result)
+          res.status(409).json({"error": `A Teacher with this name ${req.body.firstName} ${req.body.lastName} already exists`})
+        else{
+          teacherMod.save((error, result)=> {
+            error? res.status(400).json({error: error})
+            : res.status(201).json({ "teacher":result })
+          });
+        }
       });
     }
   })

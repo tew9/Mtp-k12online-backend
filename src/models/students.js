@@ -42,7 +42,6 @@ const StudentSchema = new mongoose.Schema({
   },
   email:{
     type: String,
-    required: true,
     trim: true,
     min: 1,
     max:30
