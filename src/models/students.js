@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const slug = require('slugify')
 
 //create schema
-const studentSchema = new mongoose.Schema({
+const StudentSchema = new mongoose.Schema({
   ID: {type: String, required: true, unique: true},
   slug: {type: String, required: true, unique: true},
   firstName:{
@@ -38,11 +38,11 @@ const studentSchema = new mongoose.Schema({
     type: Date,
   },
   dob: {
-    type: Date
+    type: Date,
+    required:true
   },
   email:{
     type: String,
-    required: true,
     trim: true,
     min: 1,
     max:30
@@ -98,9 +98,9 @@ const studentSchema = new mongoose.Schema({
   registeredBy: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}],
 }, {timestampts: true})
 
-studentSchema.virtual('fullName')
+StudentSchema.virtual('fullName')
 .get(function(){
   return `${this.firstName} ${this.middleName} ${this.lastName}`;
 });
 
-module.exports = mongoose.model('Students', studentSchema);
+module.exports = mongoose.model('Students', StudentSchema);

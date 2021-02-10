@@ -1,4 +1,4 @@
-const teacherModel =  require('../models/teachers');
+const TeacherModel =  require('../models/teachers');
 const slugify = require('slugify');
 
 /**
@@ -7,10 +7,12 @@ const slugify = require('slugify');
 **/
 
 exports.registerTeacher = (req, res) => {
-  const {firstName, lastName, middleName, dob, gender, email, cellPhone,
+  const {firstName, lastName, middleName, occupation, gender, email, cellPhone,
          county, country, state, city, zipCode,   } = req.body;
 
+  var { dob }  = req.body;
   dob = new Date(dob);
+  const ID = slugify(`${firstName}${lastName}${dob}`)
   let ImageUrl
   const teacherObject = {
     firstName,
@@ -22,10 +24,11 @@ exports.registerTeacher = (req, res) => {
     zipCode,
     email,
     country,
+    occupation,
     county,
     city,
     state,
-    slug: slugify(`${firstName}${lastName}${dob}`),
+    slug: ID,
     profilePicture: ImageUrl
   }
 
@@ -33,15 +36,30 @@ exports.registerTeacher = (req, res) => {
     teacherObject.teacherImage = process.env.API+'/public/'+req.file.filename
   }
 
-  const teacher = new teacherModel(teacherObject);
-  teacher.save((error, teachers)=> {
-    error? res.status(400).json({error: error})
-    : res.status(201).json({ teachers })
-  });
+  const teacherMod = new TeacherModel(teacherObject);
+  TeacherModel.findOne({email: req.body.email})
+  .exec((error, teacher) => {
+    if(teacher)
+      res.status(409).json({"error": `A Teacher with email ${req.body.email} already exists`})
+    else{
+      TeacherModel.findOne({slug: ID})
+      .exec((error, result) => {
+        if(result)
+          res.status(409).json({"error": `A Teacher with this name ${req.body.firstName} ${req.body.lastName} already exists`})
+        else{
+          teacherMod.save((error, result)=> {
+            error? res.status(400).json({error: error})
+            : res.status(201).json({ "teacher":result })
+          });
+        }
+      });
+    }
+  })
+  
 }
 
 exports.fetchTeachers = (req, res) => {
-  teacherModel.find({})
+  TeacherModel.find({})
   .exec((error, teachers) => {
     if(teachers){
       res.status(200).json({teachers})
@@ -54,7 +72,7 @@ exports.fetchTeachers = (req, res) => {
 
 exports.fetchTeacher = (req, res) => {
   if(req.params.fullName !== undefined){
-    teacherModel.find({slug: req.params.fullName.replace(/ /g,"-")})
+    TeacherModel.find({slug: req.params.fullName.replace(/ /g,"-")})
     .exec((error, teachers) => {
       if(teachers){
         res.status(200).json({teachers})
@@ -71,13 +89,13 @@ exports.fetchTeacher = (req, res) => {
 }
 
 exports.deleteTeacher = (req, res) => {
-  teacherModel.findOne({_id: req.params._id})
+  TeacherModel.findOne({_id: req.params._id})
   .exec((err, teacher) => {
     if(teacher){
-      teacherModel.deleteOne({_id: teacher._id})
+      TeacherModel.deleteOne({_id: teacher._id})
       .exec((error, response) => {
         if(response) {
-          res.status(200).json({response: {"deleted":"true"}})
+          res.status(200).json({teacher: teacher, response: {"deleted":"true"}})
         }
         else {
           res.status(400).json({error})

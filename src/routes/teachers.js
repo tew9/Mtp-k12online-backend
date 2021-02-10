@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const shortid = require('shortid');
-//const multer = require('multer');
+const multer = require('multer');
 
 const { fetchTeachers,
         fetchTeacher,
         registerTeacher,
+        deleteTeacher,
       } = require('../controllers/teachers');
-const { requireSignin, adminTeacherMiddleware } = require('../common-ware');
+const { requireSignin, adminTeacherMiddleware, adminMiddleware } = require('../common-ware');
 const { teacherValidation, isRequestValidatedTeacher } = require('../validators/teacherValidator');
 
 const storage = multer.diskStorage({
@@ -19,12 +20,12 @@ const storage = multer.diskStorage({
   }
 })
 
-//var upload = multer({ storage: storage })
+var upload = multer({ storage: storage })
 
 // router.get('/teacher/get/:lastName',  fetchStudent);
 router.get('/teacher/get', requireSignin, adminTeacherMiddleware, fetchTeachers);
 router.post('/teacher/register', teacherValidation, isRequestValidatedTeacher, upload.single('teacherPicture'), registerTeacher);
 //router.put('/teacher/approval', requireSignin, adminMiddleware, approveStudent);
-//router.delete('/teacher/delete/:_id', requireSignin, adminMiddleware, deleteStudent);
+router.delete('/teacher/delete/:_id', requireSignin, adminMiddleware, deleteTeacher);
 
 module.exports = router;
