@@ -3,9 +3,15 @@ const jwt = require('jsonwebtoken');
 exports.requireSignin = (req, res, next) => {
   if(req.headers.authorization){
     const token = req.headers.authorization.split(" ")[1];
-    const user = jwt.verify(token, process.env.JWT_SECRETE)
-    req.user = user;
-    next();
+    try
+    {
+      const user = jwt.verify(token, process.env.JWT_SECRETE)
+      req.user = user;
+      next();
+    }
+    catch(err){
+      res.status(403).json("You're signed out, Please, signin first as teacher or director to view all students.")
+    }
   }
   else {
     res.status(403).json({Access_Denied: "You must signin first"})

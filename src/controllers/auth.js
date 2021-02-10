@@ -35,21 +35,25 @@ exports.signup = (req, res) => {
         saveAccount(_user, res, role, slug);
       }
 
-      if(role === 'director'){
-        const _user  = new User({
-          slug,
-          firstName,
-          lastName,
-          email,
-          dob,
-          hash_password,
-          userName: `${firstName}${lastName}${req.body.dob.split("-")[2]}`,
-          role: 'director'
-        });
-        saveAccount(_user, res, role, slug);
+      else if(role === 'director'){
+        if(req.body.code !== "CHANG")
+          res.status(400).json("You've specified your role as director but haven't provided the correct admin code, please contact site admins for correct code.")
+        else{
+          const _user  = new User({
+            slug,
+            firstName,
+            lastName,
+            email,
+            dob,
+            hash_password,
+            userName: `${firstName}${lastName}${req.body.dob.split("-")[2]}`,
+            role: 'director'
+          });
+          saveAccount(_user, res, role, slug);
+        }
       }
 
-      if(role === 'student'){
+     else if(role === 'student'){
         const _user  = new User({
           slug,
           firstName,
@@ -62,59 +66,71 @@ exports.signup = (req, res) => {
         });
         saveAccount(_user, res, role, slug);
       }
+      else{
+        res.status(404).json({error: "please specify your role as either teacher, or student, or contact school adminstration."})
+      }
     }
   })
 }
 
 const saveAccount = (_user, res, role, slug) => {
-  TeacherModel.findOne({slug: slug})
-  .exec((err, teacher) => {
-    if(teacher){
-      _user.save((error, data) => {
-        if(error) return res.status(400).json({
-          error: `something went wrong:${error}`
-        })
-        if(!role) role="teacher"
-        if(data) return res.status(201).json({
-          message: `${role} is registered successfuly..!`,
-          result: data
+  if(role.toLowerCase() ==='teacher')
+  {
+    TeacherModel.findOne({slug: slug})
+    .exec((err, teacher) => {
+      if(teacher){
+        _user.save((error, data) => {
+          if(error) return res.status(400).json({
+            error: `something went wrong:${error}`
           })
-      });
-    }
-    else if(role == "director"){
-      _user.save((error, data) => {
-        if(error) return res.status(400).json({
-          error: `something went wrong:${error}`
-        })
-        if(!role) role="student"
-        if(data) return res.status(201).json({
-          message: `${role} is registered successfuly..!`,
-          result: data
-        })
-      });
-    }
-    else{
-      StudentModel.findOne({slug: slug})
-      .exec((err, student) => {
-        if(student){
-          _user.save((error, data) => {
-            if(error) return res.status(400).json({
-              error: `something went wrong:${error}`
+          if(!role) role="teacher"
+          if(data) return res.status(201).json({
+            message: `${role} is registered successfuly..!`,
+            result: data
             })
-            if(!role) role="student"
-            if(data) return res.status(201).json({
-              message: `${role} is registered successfuly..!`,
-              result: data
-            })
-          });
-        }
-        else{
-          res.status(404).json({error: "there's no teacher/student with those info, Please register first."})
-        }
+        });
+      }
+      else{
+        res.status(404).json({error: "There's no teacher with those info, Please get register first or contact director!."})
+      }
+    });
+  }
+  else if(role.toLowerCase() === "director"){
+    _user.save((error, data) => {
+      if(error) return res.status(400).json({
+        error: `something went wrong:${error}`
+      })
+      if(!role) role="student"
+      if(data) return res.status(201).json({
+        message: `${role} is registered successfuly..!`,
+        result: data
+      })
+    });
+  }
+  else if(role.toLowerCase() === "student"){
+    StudentModel.findOne({slug: slug})
+    .exec((err, student) => {
+      if(student){
+        _user.save((error, data) => {
+          if(error) return res.status(400).json({
+            error: `something went wrong:${error}`
+          })
+          if(!role) role="student"
+          if(data) return res.status(201).json({
+            message: `${role} is registered successfuly..!`,
+            result: data
+          })
+        });
+      }
+      else{
+        res.status(404).json({error: "There's no student with those info, Please register first, or contact school adminstration."})
+      }
         
-      });
-    }
-  });
+    });
+  }
+  else{
+    res.status(404).json({role: "Please Specify your role as either student or teacher"})
+  }
 }
 
 exports.signin = (req, res) => {
