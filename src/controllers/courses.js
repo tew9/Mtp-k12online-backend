@@ -1,4 +1,5 @@
 const courseModel =  require('../models/courses');
+const ID = require("nodejs-unique-numeric-id-generator")
 const slugify = require('slugify');
 
 /**
@@ -20,18 +21,29 @@ exports.approveCourse = (req, res) => {
 }
 
 exports.registerCourse = (req, res) => {
-  const {title, teachers, students, period, time } = req.body;
+  const { title, level } = req.body;
+  var courseId = ID.generate(new Date().toJSON());
+  var slug = slugify(`${title}_${level}`);
+  
   const courseObject = {
     title,
-    teachers,
-    students,
-    ID: slugify(`${title}`),
+    level,
+    ID: courseId,
+    slug: slug,
+    createdBy: req.user
   }
 
   const course = new courseModel(courseObject);
-  course.save((error, course)=>{
-    error? res.status(400).json({error: error})
-    : res.status(201).json({ course })
+  courseModel.findOne({slug: slug})
+  .exec((error, subject) => {
+    if(subject)
+      res.status(409).json({error: `This subject ${slug.split("_")[0]} is already registered for ${slug.split("_")[1]} !!!`})
+    else{
+      course.save((error, course)=>{
+        error? res.status(400).json({error: error})
+        : res.status(201).json({ course })
+      });
+    }
   });
 }
 
@@ -39,17 +51,17 @@ exports.fetchCourses = (req, res) => {
   courseModel.find({})
   .exec((error, courses) => {
     if(courses){
-      res.status(200).json({courses})
+      res.status(200).json({ courses })
     }
     else {
-      res.status(400).json({error})
+      res.status(400).json({ error })
     }
   });
 }
 
 exports.fetchCourseByTitle = (req, res) => {
   if(req.params.title !== undefined){
-    courseModel.find({slug: req.params.title})
+    courseModel.find({title: req.params.title})
     .exec((error, courses) => {
       if(courses){
         res.status(200).json({courses})

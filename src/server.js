@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-const userRoutes = require('./routes/auth/auth')
+const userRoutes = require('./routes/auth')
 const studentRoutes = require('./routes/students')
 const courseRoutes = require('./routes/courses')
 const teacherRoutes = require('./routes/teachers')

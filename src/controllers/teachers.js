@@ -29,6 +29,7 @@ exports.registerTeacher = (req, res) => {
     city,
     state,
     slug: ID,
+    createdBy: req.user,
     profilePicture: ImageUrl
   }
 

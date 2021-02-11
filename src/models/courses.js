@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
 //create schema
-const courseSchema = new mongoose.Schema({
-  ID: {type: String, required: true, unique: true},
+const subjectSchema = new mongoose.Schema({
+  slug: {type: String, required: true, unique: true},
+  ID: {type: String, required: true},
   title:{
     type: String,
     required: true,
@@ -10,8 +11,9 @@ const courseSchema = new mongoose.Schema({
     min: 1,
     max:12
   },
+  level:{ type: String, required: true },
   periodStarts: { type: Number },
-  periodEnds: { type: Number},
+  periodEnds: { type: Number },
   teachers: {
     type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Teachers'}],
     trim: true,
@@ -28,4 +30,4 @@ const courseSchema = new mongoose.Schema({
   createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
 }, {timestampts: true})
 
-module.exports = mongoose.model('Courses', courseSchema);
+module.exports = mongoose.model('Subjects', subjectSchema);
