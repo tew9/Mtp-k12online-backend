@@ -162,8 +162,9 @@ exports.signin = (req, res) => {
     User.findOne({userName: req.body.userName})
     .exec((error, user) => {
       if(!user) return res.status(409).json({message: "Wrong username or Password, Please try again"})
-
+      
       else if(user){
+        console.log(user)
         if(user.authenticate(req.body.password)){
           const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRETE, 
             {expiresIn: '1d'});

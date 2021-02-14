@@ -85,6 +85,12 @@ const StudentSchema = new mongoose.Schema({
     trim: true,
     minlength: 2,
   },
+  level: {
+    require: true,
+    type: Number,
+    trim: true,
+    minlength: 2,
+  },
   zipCode: {
     type: String,
     trim: true,

@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const env = require('dotenv');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const { connectDb } = require('./utils/connectDb')
 const cors = require('cors');
 
 const userRoutes = require('./routes/auth')
@@ -15,20 +15,7 @@ const app = express();
 
 //constants
 env.config();
-
-mongoose.connect(
-  `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@cluster0.g3zzd.mongodb.net/${process.env.MONGO_DB_DATABASE}?retryWrites=true&w=majority`,
- {
-   useNewUrlParser: true,
-   useUnifiedTopology: true,
-   useCreateIndex: true,
-   useFindAndModify: false
-  })
-  .then(() => {
-    console.log("database connected!!")
-  })
-  .catch(err => console.log(`error happened: ${err}`)
-);
+connectDb();
 
 //Middlewares
 
@@ -41,6 +28,7 @@ app.use('/api', studentRoutes)
 app.use('/api', courseRoutes)
 app.use('/api', teacherRoutes)
 app.use('/api', classRoutes)
+
 
 
 app.listen(process.env.PORT, () => {
