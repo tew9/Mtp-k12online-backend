@@ -1,4 +1,4 @@
-const courseModel =  require('../models/courses');
+const SubjectModel =  require('../models/courses');
 const ID = require("nodejs-unique-numeric-id-generator")
 const slugify = require('slugify');
 
@@ -7,15 +7,18 @@ const slugify = require('slugify');
 * @function Course-Controller
 **/
 
-exports.approveCourse = (req, res) => {
-  const {approval} = req.body;
-  var query = { approval: false };
+exports.updateSubject = (req, res) => {
+  const { timePeriod, teacher, student, title, level } = req.body;
+  var approval = true
+  var updatedBy = req.user;
+  var slug = slugify(`${title}_${level}th-grade`);
+  console.log(timePeriod)
+
   if(approval){
-    var newValue = { $set: { approval: true } }
-    console.log(newValue)
-    studentModel.updateOne(query, newValue, function(err, response){
-      if(!response.result) res.status(500).json({"Update failed!!! ": err});
-      if(response.result) res.status(200).json(response.result.nModified)
+    var newValue = {approval: true, timePeriod, updatedBy, teacher, student, level}
+    SubjectModel.updateOne({slug}, newValue, function(err, response){
+     if(response.n >= 1) res.status(200).json({"updated": "true"})
+     else{ res.status(400).json({"updated": "failed, the record doesn't exists", "result": response})}
     });
   }
 }

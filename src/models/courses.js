@@ -11,9 +11,8 @@ const subjectSchema = new mongoose.Schema({
     min: 1,
     max:12
   },
-  level:{ type: String, required: true },
-  periodStarts: { type: Number },
-  periodEnds: { type: Number },
+  level:{ type: Number, required: true },
+  timePeriod: {type: [{startPeriod: Number, endPeriod: Number}]},
   teachers: {
     type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Teachers'}],
     trim: true,
@@ -27,7 +26,8 @@ const subjectSchema = new mongoose.Schema({
     min: 3,
     max: 20
   },
-  createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
+  createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}],
+  updatedBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
 }, {timestampts: true})
 
 module.exports = mongoose.model('Subjects', subjectSchema);

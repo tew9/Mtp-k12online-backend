@@ -138,7 +138,6 @@ exports.signin = (req, res) => {
     User.findOne({email: req.body.email})
     .exec((error, user) => {
       if(!user) return res.status(400).json({message: `Wrong username or Password, Please try again`})
-      
       else if(user) {
         if(user.authenticate(req.body.password)){
           const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRETE, 
@@ -150,7 +149,6 @@ exports.signin = (req, res) => {
             user: {_id, userName, firstName, lastName, email, role, fullName}
           })
         }
-        
         else {
           return res.status(400).json({message: "Wrong username or Password, Please try again"})
         }
@@ -158,13 +156,11 @@ exports.signin = (req, res) => {
     });
   }
 
-  if(req.body.userName){
+  else if(req.body.userName){
     User.findOne({userName: req.body.userName})
     .exec((error, user) => {
       if(!user) return res.status(409).json({message: "Wrong username or Password, Please try again"})
-      
-      else if(user){
-        console.log(user)
+      else{
         if(user.authenticate(req.body.password)){
           const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRETE, 
             {expiresIn: '1d'});
@@ -175,12 +171,14 @@ exports.signin = (req, res) => {
             user: {_id, userName, firstName, lastName, email, role, fullName}
           })
         }
-        
         else {
           return res.status(400).json({message: "Wrong username or Password, Please try again"})
         }
       }
     });
+  }
+  else{
+    return res.status(400).json({BadRequest: "Please enter userName or email"})
   }
 }
 

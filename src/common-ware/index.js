@@ -10,7 +10,7 @@ exports.requireSignin = (req, res, next) => {
       next();
     }
     catch(err){
-      res.status(403).json("You're signed out, Please, signin first as teacher or director to view all students.")
+      res.status(403).json("You've been signed out, Please, signin first.")
     }
   }
   else {

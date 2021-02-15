@@ -49,7 +49,7 @@ exports.registerTeacher = (req, res) => {
           res.status(409).json({"error": `A Teacher with this name ${req.body.firstName} ${req.body.lastName} already exists`})
         else{
           teacherMod.save((error, result)=> {
-            error? res.status(400).json({error: error})
+            error? res.status(400).json({error: 'error happened', error})
             : res.status(201).json({ "teacher":result })
           });
         }

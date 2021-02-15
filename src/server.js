@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const env = require('dotenv');
 const bodyParser = require('body-parser');
-const { connectDb } = require('./utils/connectDb')
+const { connectDB } = require('./utils/connectDb')
 const cors = require('cors');
 
 const userRoutes = require('./routes/auth')
@@ -15,12 +15,12 @@ const app = express();
 
 //constants
 env.config();
-connectDb();
+connectDB();
 
 //Middlewares
 
 app.use(cors());
-//app.use('/public', express.static(path.join(__dirname, 'uploads')))
+app.use('/public', express.static(path.join(__dirname, 'uploads')))
 app.use(bodyParser.json())
 
 app.use('/api', userRoutes)
