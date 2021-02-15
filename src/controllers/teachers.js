@@ -6,6 +6,17 @@ const slugify = require('slugify');
 * @function Teacher-Controller
 **/
 
+exports.approveTeacher = (req, res) => {
+  const {_id} = req.body;
+  if(approval){
+    var newValue = { approval: true }
+    TeacherModel.updateOne({_id}, newValue, function(err, response){
+      if(response.n >= 1) res.status(204).json({"Update": "updated succesfuly"});
+      else res.status(400).json({response: response})
+    });
+  }
+}
+
 exports.registerTeacher = (req, res) => {
   const {firstName, lastName, middleName, occupation, gender, email, cellPhone,
          county, country, state, city, zipCode,   } = req.body;
@@ -72,11 +83,11 @@ exports.fetchTeachers = (req, res) => {
 }
 
 exports.fetchTeacher = (req, res) => {
-  if(req.params.fullName !== undefined){
-    TeacherModel.find({slug: req.params.fullName.replace(/ /g,"-")})
-    .exec((error, teachers) => {
-      if(teachers){
-        res.status(200).json({teachers})
+  if(req.params._id !== undefined){
+    TeacherModel.find({_id: req.params._id})
+    .exec((error, teacher) => {
+      if(teacher){
+        res.status(200).json({teacher})
       }
       else {
         res.status(400).json({error})
@@ -84,7 +95,7 @@ exports.fetchTeacher = (req, res) => {
     });
   }
   else{
-    res.status(400).json("Bad Requests, provide your full name")
+    res.status(400).json("Bad Requests, please enter teacher's ID.")
   }
   
 }

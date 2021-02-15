@@ -8,22 +8,19 @@ const slugify = require('slugify');
 **/
 
 exports.approveStudent = (req, res) => {
-  const {approval} = req.body;
-  var query = { approval: false};
+  const {_id} = req.body;
   if(approval){
-    var newValue = { $set: { approval: true } }
-    StudentModel.updateOne(query, newValue, function(err, response){
-      if(!response.result) res.status(500).json({"Update failed!!! ": err});
-      if(response.result) res.status(200).json(response.result.nModified)
+    var newValue = { approval: true }
+    StudentModel.updateOne({_id}, newValue, function(err, response){
+      if(response.n >= 1) res.status(204).json({"Update": "updated succesfuly"});
+      else res.status(400).json(response.result.nModified)
     });
   }
 }
 
 exports.registerStudent = (req, res) => {
-
   const { firstName, lastName, middleName,
           gender, email, cellPhone, city, county, country, } = req.body;
-
   var { dob }  = req.body;
   dob = new Date(dob);
   enrolledDate = new Date()
@@ -87,11 +84,11 @@ exports.fetchStudents = (req, res) => {
 }
 
 exports.fetchStudent = (req, res) => {
-  if(req.params.fullName !== undefined){
-    StudentModel.find({slug: req.params.fullName.replace(/ /g,"-")})
-    .exec((error, students) => {
-      if(students){
-        res.status(200).json({students})
+  if(req.params._id !== undefined){
+    StudentModel.find({_id: req.params._id})
+    .exec((error, student) => {
+      if(student){
+        res.status(200).json({student})
       }
       else {
         res.status(400).json({error})
@@ -101,7 +98,6 @@ exports.fetchStudent = (req, res) => {
   else{
     res.status(400).json("Bad Requests, provide your full name")
   }
-  
 }
 
 exports.deleteStudent = (req, res) => {

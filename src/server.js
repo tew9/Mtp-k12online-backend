@@ -7,7 +7,7 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/auth')
 const studentRoutes = require('./routes/students')
-const courseRoutes = require('./routes/courses')
+const SubjectRoutes = require('./routes/subjects')
 const teacherRoutes = require('./routes/teachers')
 const classRoutes = require('./routes/classes')
 
@@ -25,7 +25,7 @@ app.use(bodyParser.json())
 
 app.use('/api', userRoutes)
 app.use('/api', studentRoutes)
-app.use('/api', courseRoutes)
+app.use('/api', SubjectRoutes)
 app.use('/api', teacherRoutes)
 app.use('/api', classRoutes)
 

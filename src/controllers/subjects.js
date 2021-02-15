@@ -1,10 +1,10 @@
-const SubjectModel =  require('../models/courses');
+const SubjectModel =  require('../models/subjects');
 const ID = require("nodejs-unique-numeric-id-generator")
 const slugify = require('slugify');
 
 /**
 * @author
-* @function Course-Controller
+* @function Subject-Controller
 **/
 
 exports.updateSubject = (req, res) => {
@@ -12,49 +12,47 @@ exports.updateSubject = (req, res) => {
   var approval = true
   var updatedBy = req.user;
   var slug = slugify(`${title}_${level}th-grade`);
-  console.log(timePeriod)
-
   if(approval){
     var newValue = {approval: true, timePeriod, updatedBy, teacher, student, level}
     SubjectModel.updateOne({slug}, newValue, function(err, response){
-     if(response.n >= 1) res.status(200).json({"updated": "true"})
+     if(response.n >= 1) res.status(204).json({"updated": "true"})
      else{ res.status(400).json({"updated": "failed, the record doesn't exists", "result": response})}
     });
   }
 }
 
-exports.registerCourse = (req, res) => {
+exports.registerSubject = (req, res) => {
   const { title, level } = req.body;
-  var courseId = ID.generate(new Date().toJSON());
+  var SubjectId = ID.generate(new Date().toJSON());
   var slug = slugify(`${title}_${level}`);
   
-  const courseObject = {
+  const SubjectObject = {
     title,
     level,
-    ID: courseId,
+    ID: SubjectId,
     slug: slug,
     createdBy: req.user
   }
 
-  const course = new courseModel(courseObject);
-  courseModel.findOne({slug: slug})
+  const Subject = new SubjectModel(SubjectObject);
+  SubjectModel.findOne({slug: slug})
   .exec((error, subject) => {
     if(subject)
       res.status(409).json({error: `This subject ${slug.split("_")[0]} is already registered for ${slug.split("_")[1]} !!!`})
     else{
-      course.save((error, course)=>{
+      Subject.save((error, Subject)=>{
         error? res.status(400).json({error: error})
-        : res.status(201).json({ course })
+        : res.status(201).json({ Subject })
       });
     }
   });
 }
 
-exports.fetchCourses = (req, res) => {
-  courseModel.find({})
-  .exec((error, courses) => {
-    if(courses){
-      res.status(200).json({ courses })
+exports.fetchSubjects = (req, res) => {
+  SubjectModel.find({})
+  .exec((error, Subjects) => {
+    if(Subjects){
+      res.status(200).json({ Subjects })
     }
     else {
       res.status(400).json({ error })
@@ -62,12 +60,12 @@ exports.fetchCourses = (req, res) => {
   });
 }
 
-exports.fetchCourseByTitle = (req, res) => {
+exports.fetchSubject = (req, res) => {
   if(req.params.title !== undefined){
-    courseModel.find({title: req.params.title})
-    .exec((error, courses) => {
-      if(courses){
-        res.status(200).json({courses})
+    SubjectModel.find({title: req.params.title})
+    .exec((error, Subjects) => {
+      if(Subjects){
+        res.status(200).json({Subjects})
       }
       else {
         res.status(400).json({error})
@@ -79,11 +77,11 @@ exports.fetchCourseByTitle = (req, res) => {
   }
 }
 
-exports.deleteCourse = (req, res) => {
+exports.deleteSubject = (req, res) => {
   studentModel.findOne({_id: req.params._id})
-  .exec((err, course) => {
-    if(course){
-      courseModel.deleteOne({_id: student._id})
+  .exec((err, Subject) => {
+    if(Subject){
+      SubjectModel.deleteOne({_id: student._id})
       .exec((error, response) => {
         if(response) {
           res.status(200).json({response: {"deleted":"true"}})
