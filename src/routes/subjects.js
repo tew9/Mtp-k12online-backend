@@ -6,13 +6,13 @@ const { fetchSubjects,
         deleteSubject,
         registerSubject
       } = require('../controllers/subjects');
-const { requireSignin, adminMiddleware, adminTeacherMiddleware } = require('../common-ware');
-const { SubjectValidation, isRequestValidatedSubject , subjectUpdateValidation} = require('../validators/subjectValidator');
+const { requireSignin, adminTeacherMiddleware } = require('../common-ware');
+const { SubjectValidation, isRequestValidatedSubject} = require('../validators/subjectValidator');
 
 router.get('/subjects/get', fetchSubjects);
 router.get('/subjects/:_id', fetchSubject);
 router.post('/subjects/register', requireSignin, adminTeacherMiddleware, SubjectValidation, isRequestValidatedSubject, registerSubject);
-router.put('/subjects/update', requireSignin, adminTeacherMiddleware, subjectUpdateValidation, isRequestValidatedSubject, updateSubject);
+router.put('/subjects/update/:_id', requireSignin, adminTeacherMiddleware, updateSubject);
 router.delete('/subjects/delete/:_id', requireSignin, adminTeacherMiddleware, deleteSubject);
 
 module.exports = router;

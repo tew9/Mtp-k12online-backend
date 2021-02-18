@@ -18,7 +18,7 @@ const classSchema = new mongoose.Schema({
     min: 3,
     max: 20
   },
-  Description: {
+  description: {
     type: String,
     trim: true,
     minlength: 3,
@@ -34,7 +34,8 @@ const classSchema = new mongoose.Schema({
   }, 
   begins: Date,
   ends: Date,
-  createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
+  createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}],
+  updatedBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
 }, {timestampts: true})
 
 classSchema.virtual('name')

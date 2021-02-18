@@ -7,33 +7,53 @@ const ID = require("nodejs-unique-numeric-id-generator")
 * @function Class-Controller
 **/
 
-exports.approveClass = (req, res) => {
-  const {approval} = req.body;
-  var query = { approval: false};
-  if(approval){
-    var newValue = { $set: { approval: true } }
-    console.log(newValue)
-    ClassModel.updateOne(query, newValue, function(err, response){
-      if(!response.result) res.status(500).json({"Update failed!!! ": err});
-      if(response.result) res.status(200).json(response.result.nModified)
-    });
+exports.updateClass = (req, res) => {
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct class ID, and add it to params, or contact admin/IT")
   }
+
+  var id = req.params._id;
+  const { begins, ends, subjects, description,
+          capacity, facilities
+  } = req.body;
+  var beginsOn = null;
+  var endsOn = null
+  if(begins != null && ends != null){
+    beginsOn =  new Date(begins)
+    endsOn = new Date(ends)
+  }
+  var updateObject = {};
+  subjects != null? updateObject.subjects = subjects: updateObject
+  begins != null? updateObject.begins = beginsOn: updateObject
+  ends != null? updateObject.ends = endsOn: updateObject
+  description != null? updateObject.description = description: updateObject
+  capacity != null? updateObject.capacity = capacity: updateObject
+  facilities != null? updateObject.facilities = facilities: updateObject
+  updateObject.updatedBy = req.user;
+ 
+  ClassModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
+    if(response != null) res.status(204).json({"Update": "updated succesfuly"});
+    else res.status(400).json({error: "There's no class with specified ID, please enter the correct ID and try again."})
+  });  
 }
 
 exports.registerClass = (req, res) => {
-  const {title, subjects, capacity, facilities, begins, ends } = req.body;
+  const {title, subjects, capacity, facilities, begins, ends, description } = req.body;
   var beginsOn = null
   var endsOn = null
   if(begins != null && ends != null){
     beginsOn = new Date(begins);
     endsOn = new Date(ends)
   }
+  var createdBy = req.user;
   var slug = slugify(`${title}${capacity}`, '_');
   var classId = ID.generate(new Date().toJSON());
   let classImageUrl
   const classObject = {
     ID: classId,
     title,
+    description,
+    createdBy,
     subjects,
     capacity,
     facilities,
@@ -47,10 +67,17 @@ exports.registerClass = (req, res) => {
     classObject.classImage = process.env.API+'/public/'+req.file.filename
   }
 
-  const Class = new ClassModel(classObject);
-  Class.save((error, classs)=>{
-    error? res.status(400).json({error: error})
-    : res.status(201).json({ classs })
+  ClassModel.findOne({slug: slug})
+  .exec((err, cl) => {
+    if(!cl){
+      const Class = new ClassModel(classObject);
+      Class.save((error, classs)=>{
+        error? res.status(400).json({error: error})
+        : res.status(201).json({ classs })
+      });
+    }else{
+      res.status(409).json({"error": "This class is already registered, check the inputs and try again."})
+    }
   });
 }
 
@@ -67,9 +94,9 @@ exports.fetchClasses = (req, res) => {
 }
 
 exports.fetchClass = (req, res) => {
-  if(req.params.slug !== undefined)
+  if(req.params.title !== undefined)
   {
-    ClassModel.find({slug: req.params.slug})
+    ClassModel.find({title: req.params.title})
     .exec((error, classes) => {
       if(classes){
         res.status(200).json({classes})
@@ -80,26 +107,21 @@ exports.fetchClass = (req, res) => {
     });
   }
   else{
-      res.status(400).json("Bad Requests, please, provide correct class title");
+      res.status(400).json("Bad Requests, Pleas, provide correct class title");
   }
 }
 
 exports.deleteClass = (req, res) => {
-  ClassModel.findOne({_id: req.params._id})
-  .exec((err, classes) => {
-    if(classes){
-      ClassModel.deleteOne({_id: classes._id})
-      .exec((error, response) => {
-        if(response) {
-          res.status(200).json({response: {"deleted":"true"}})
-        }
-        else {
-          res.status(400).json({error})
-        }
-      });
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct class ID, and add it to params or contact admins/IT.")
+  }
+  ClassModel.findOneAndDelete({ID: req.params._id})
+  .exec((error, response) => {
+    if(response) {
+      res.status(200).json({response: response, deleted:"true"})
     }
-    else{
-        res.status(400).json(`Bad request, No class exist with that ID! error: ${err}`)
+    else {
+      res.status(400).json(`Bad request, No class exist with that ID! error`)
     }
-  })
+  });
 }

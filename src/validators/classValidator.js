@@ -12,6 +12,12 @@ exports.classValidation = [
   .withMessage('Atleast one subject is required for a class to be created.'),
 ]
 
+exports.classUpdateValidation = [
+  check('title')
+  .notEmpty()
+  .withMessage('Please enter the name of the class you want to update, as title'),
+]
+
 exports.isRequestValidatedClass = (req, res, next) => {
   const errors = validationResult(req);
   if(errors.array().length > 0){

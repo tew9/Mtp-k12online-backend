@@ -23,11 +23,11 @@ const storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-router.get('/student/get/:_id',  fetchStudent);
-router.get('/student/get', requireSignin, adminTeacherMiddleware, fetchStudents);
-router.post('/student/register', studentValidation, isRequestValidatedStudent,
+router.get('/students/get/:_id',  fetchStudent);
+router.get('/students/get', requireSignin, adminTeacherMiddleware, fetchStudents);
+router.post('/students/register', studentValidation, isRequestValidatedStudent,
                                  upload.single('studentPicture'), registerStudent);
-router.put('/student/approval', requireSignin, adminTeacherMiddleware, approveStudent);
-router.delete('/student/delete/:_id', requireSignin, adminMiddleware, deleteStudent);
+router.put('/students/update/:_id', requireSignin, adminTeacherMiddleware, approveStudent);
+router.delete('/students/delete/:_id', requireSignin, adminMiddleware, deleteStudent);
 
 module.exports = router;

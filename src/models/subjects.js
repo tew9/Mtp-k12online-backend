@@ -20,6 +20,7 @@ const subjectSchema = new mongoose.Schema({
     max: 20
   },
   approval: { type: Boolean, default: false},
+  description: { type: String},
   students: {
     type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Students'}],
     trim: true,

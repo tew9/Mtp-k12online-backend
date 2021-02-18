@@ -1,4 +1,5 @@
 const TeacherModel =  require('../models/teachers');
+const ID = require("nodejs-unique-numeric-id-generator")
 const slugify = require('slugify');
 
 /**
@@ -6,15 +7,36 @@ const slugify = require('slugify');
 * @function Teacher-Controller
 **/
 
-exports.approveTeacher = (req, res) => {
-  const {_id} = req.body;
-  if(approval){
-    var newValue = { approval: true }
-    TeacherModel.updateOne({_id}, newValue, function(err, response){
-      if(response.n >= 1) res.status(204).json({"Update": "updated succesfuly"});
-      else res.status(400).json({response: response})
-    });
+exports.updateTeacher = (req, res) => {
+  if(!req.params._id){
+    return res.status(400).json("Please specify the teacherId and add it to params")
   }
+  var id = req.params._id
+  const { firstName, lastName, middleName, occupation, location, state, level,
+          gender, email, cellPhone, city, county, country, zipCode } = req.body;
+
+  var updateObject = {};
+  firstName != null? updateObject.firstName = firstName: updateObject
+  lastName != null? updateObject.lastName = lastName: updateObject
+  middleName != null? updateObject.middleName = middleName: updateObject
+  occupation != null? updateObject.occupation =occupation: updateObject
+  location != null? updateObject.location = location: updateObject
+  state != null? updateObject.state = state: updateObject
+  level != null? updateObject.level = level: updateObject
+  gender != null? updateObject.gender = gender: updateObject
+  email != null? updateObject.email = email: updateObject
+  cellPhone != null? updateObject.cellPhone = cellPhone: updateObject
+  city != null? updateObject.city = city: updateObject
+  county != null? updateObject.county = county: updateObject
+  country != null? updateObject.country = country: updateObject
+  zipCode != null? updateObject.zipCode = zipCode: updateObject
+  updateObject.approval = true;
+  updateObject.updatedBy = req.user;
+
+  TeacherModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
+    if(response != null) res.status(204).json(response);
+    else res.status(400).json({err: "We can't find teacher with given ID, Please provide the correct ID"})
+  });  
 }
 
 exports.registerTeacher = (req, res) => {
@@ -23,7 +45,8 @@ exports.registerTeacher = (req, res) => {
 
   var { dob }  = req.body;
   dob = new Date(dob);
-  const ID = slugify(`${firstName}${lastName}${dob}`)
+  const slug = slugify(`${firstName}${lastName}${dob}`)
+  var teacherId = ID.generate(new Date().toJSON());
   let ImageUrl
   const teacherObject = {
     firstName,
@@ -39,7 +62,8 @@ exports.registerTeacher = (req, res) => {
     county,
     city,
     state,
-    slug: ID,
+    ID: teacherId,
+    slug: slug,
     createdBy: req.user,
     profilePicture: ImageUrl
   }
@@ -101,21 +125,16 @@ exports.fetchTeacher = (req, res) => {
 }
 
 exports.deleteTeacher = (req, res) => {
-  TeacherModel.findOne({_id: req.params._id})
-  .exec((err, teacher) => {
-    if(teacher){
-      TeacherModel.deleteOne({_id: teacher._id})
-      .exec((error, response) => {
-        if(response) {
-          res.status(200).json({teacher: teacher, response: {"deleted":"true"}})
-        }
-        else {
-          res.status(400).json({error})
-        }
-      });
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct teacher ID, and add it to params or contact admins/IT.")
+  }
+  TeacherModel.findOneAndDelete({ID: req.params._id})
+  .exec((error, response) => {
+    if(response) {
+      res.status(200).json({response: response, deleted:"true"})
     }
-    else{
-        res.status(400).json(`Bad request, No teacher exist with that ID! error: ${err}`)
+    else {
+      res.status(400).json(`Bad request, No teacher exist with that ID! error`)
     }
-  })
+  });
 }

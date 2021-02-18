@@ -8,14 +8,36 @@ const slugify = require('slugify');
 **/
 
 exports.approveStudent = (req, res) => {
-  const {_id} = req.body;
-  if(approval){
-    var newValue = { approval: true }
-    StudentModel.updateOne({_id}, newValue, function(err, response){
-      if(response.n >= 1) res.status(204).json({"Update": "updated succesfuly"});
-      else res.status(400).json(response.result.nModified)
-    });
+
+  if(!req.params._id){
+    return res.status(400).json("Please specify the studentId and add it to params")
   }
+  var id = req.params._id
+  const { firstName, lastName, middleName, enrolledDate, location, state, level,
+          gender, email, cellPhone, city, county, country, zipCode } = req.body;
+
+  var updateObject = {};
+  firstName != null? updateObject.firstName = firstName: updateObject
+  lastName != null? updateObject.lastName = lastName: updateObject
+  middleName != null? updateObject.middleName = middleName: updateObject
+  enrolledDate != null? updateObject.enrolledDate = new Date(enrolledDate): updateObject
+  location != null? updateObject.location = location: updateObject
+  state != null? updateObject.state = state: updateObject
+  level != null? updateObject.level = level: updateObject
+  gender != null? updateObject.gender = gender: updateObject
+  email != null? updateObject.email = email: updateObject
+  cellPhone != null? updateObject.cellPhone = cellPhone: updateObject
+  city != null? updateObject.city = city: updateObject
+  county != null? updateObject.county = county: updateObject
+  country != null? updateObject.country = country: updateObject
+  zipCode != null? updateObject.zipCode = zipCode: updateObject
+  updateObject.approval = true;
+  updateObject.updatedBy = req.user;
+
+  StudentModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
+    if(response != null) res.status(204).json(response);
+    else res.status(400).json({err: "We can't find student with given ID, Please provide the correct ID"})
+  });  
 }
 
 exports.registerStudent = (req, res) => {
@@ -101,21 +123,16 @@ exports.fetchStudent = (req, res) => {
 }
 
 exports.deleteStudent = (req, res) => {
-  StudentModel.findOne({_id: req.params._id})
-  .exec((err, student) => {
-    if(student){
-      StudentModel.deleteOne({_id: student._id})
-      .exec((error, response) => {
-        if(response) {
-          res.status(200).json({response: {"student": student, "deleted":"true"}})
-        }
-        else {
-          res.status(400).json({error})
-        }
-      });
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct student ID, and add it to params or contact admins/IT.")
+  }
+  StudentModel.findOneAndDelete({ID: req.params._id})
+  .exec((error, response) => {
+    if(response) {
+      res.status(200).json({response: response, deleted:"true"})
     }
-    else{
-        res.status(400).json(`Bad request, No student exist with that ID! error: ${err}`)
+    else {
+      res.status(400).json(`Bad request, No student exist with that ID! error`)
     }
-  })
+  });
 }

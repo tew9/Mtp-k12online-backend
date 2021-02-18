@@ -8,27 +8,40 @@ const slugify = require('slugify');
 **/
 
 exports.updateSubject = (req, res) => {
-  const { timePeriod, teacher, student, title, level } = req.body;
-  var approval = true
-  var updatedBy = req.user;
-  var slug = slugify(`${title}_${level}th-grade`);
-  if(approval){
-    var newValue = {approval: true, timePeriod, updatedBy, teacher, student, level}
-    SubjectModel.updateOne({slug}, newValue, function(err, response){
-     if(response.n >= 1) res.status(204).json({"updated": "true"})
-     else{ res.status(400).json({"updated": "failed, the record doesn't exists", "result": response})}
-    });
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct subject ID, and add it to params or contact admins/IT.")
   }
+  var id = req.params._id;
+  const { timePeriod, teachers, students, level, approval } = req.body;
+  var updatedBy = req.user;
+
+  var updateObject = {};
+  timePeriod != null? updateObject.timePeriod = timePeriod: updateObject
+  teachers != null? updateObject.teachers = teachers: updateObject
+  students != null? updateObject.students = students: updateObject
+  description != null? updateObject.description = description: updateObject
+  level != null? updateObject.level = level: updateObject
+  approval? updateObject.approval = approval: updateObject
+  updateObject.updatedBy = updatedBy;
+
+  SubjectModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
+    if(response != null) res.status(204).json({"Update": "updated succesfuly"});
+    else res.status(400).json({error: "There's no subject with specified ID, please enter the correct ID and try again."})
+  }); 
 }
 
 exports.registerSubject = (req, res) => {
-  const { title, level } = req.body;
+  const { title, level, timePeriod, teachers, students, description } = req.body;
   var SubjectId = ID.generate(new Date().toJSON());
   var slug = slugify(`${title}_${level}`);
   
   const SubjectObject = {
     title,
     level,
+    timePeriod, 
+    description,
+    teachers, 
+    students,
     ID: SubjectId,
     slug: slug,
     createdBy: req.user
@@ -78,21 +91,16 @@ exports.fetchSubject = (req, res) => {
 }
 
 exports.deleteSubject = (req, res) => {
-  studentModel.findOne({_id: req.params._id})
-  .exec((err, Subject) => {
-    if(Subject){
-      SubjectModel.deleteOne({_id: student._id})
-      .exec((error, response) => {
-        if(response) {
-          res.status(200).json({response: {"deleted":"true"}})
-        }
-        else {
-          res.status(400).json({error})
-        }
-      });
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct subject ID, and add it to params or contact admins/IT.")
+  }
+  SubjectModel.findOneAndDelete({ID: req.params._id})
+  .exec((error, response) => {
+    if(response) {
+      res.status(200).json({response: response, deleted:"true"})
     }
-    else{
-        res.status(400).json(`Bad request, No student exist with that ID! error: ${err}`)
+    else {
+      res.status(400).json(`Bad request, No subject exist with that ID! error`)
     }
-  })
+  });
 }

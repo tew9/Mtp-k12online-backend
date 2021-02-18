@@ -5,15 +5,16 @@ const shortid = require('shortid');
 const { fetchClasses, 
         fetchClass, 
         registerClass, 
-        deleteClass
+        deleteClass,
+        updateClass
       } = require('../controllers/classes');
 const { requireSignin, adminMiddleware, adminTeacherMiddleware } = require('../common-ware');
-const { classValidation, isRequestValidatedClass } = require('../validators/classValidator');
+const { classValidation, classUpdateValidation, isRequestValidatedClass } = require('../validators/classValidator');
 
-//router.get('/class/get/:title',  fetchStudent);
+router.get('/classes/get/:title',  fetchClass);
 router.get('/classes/get', fetchClasses);
 router.post('/classes/register', requireSignin, adminTeacherMiddleware,classValidation, isRequestValidatedClass, registerClass);
-//router.put('/class/update', requireSignin, adminMiddleware, approveStudent);
-//router.delete('/class/delete/:_id', requireSignin, adminMiddleware, deleteStudent);
+router.put('/classes/update/:_id', requireSignin, adminTeacherMiddleware, updateClass);
+router.delete('/classes/delete/:_id', requireSignin, adminMiddleware, deleteClass);
 
 module.exports = router;
