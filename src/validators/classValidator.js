@@ -9,7 +9,7 @@ exports.classValidation = [
   .withMessage('capacity is required, approximate of how many students the class would sustains'),
   check('subjects')
   .notEmpty()
-  .withMessage('subjects is required'),
+  .withMessage('Atleast one subject is required for a class to be created.'),
 ]
 
 exports.isRequestValidatedClass = (req, res, next) => {

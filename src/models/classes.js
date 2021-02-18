@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 //create schema
 const classSchema = new mongoose.Schema({
-  ID: {type: String, required: true, unique: true},
+  slug: {type: String, required:true, unique:true},
+  ID: {type: String, required: true},
   title:{
     type: String,
     required: true,
@@ -18,12 +19,12 @@ const classSchema = new mongoose.Schema({
     max: 20
   },
   Description: {
-    type: string,
+    type: String,
     trim: true,
     minlength: 3,
   },
   capacity: {
-    type: Int16Array,
+    type: Number,
     trim: true,
     required: true
   },
