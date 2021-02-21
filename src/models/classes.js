@@ -12,7 +12,7 @@ const classSchema = new mongoose.Schema({
     max:30
   },
   subjects:{
-    type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Courses'}],
+    type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Subjects'}],
     required: true,
     trim: true,
     min: 3,

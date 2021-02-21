@@ -63,6 +63,8 @@ exports.registerSubject = (req, res) => {
 
 exports.fetchSubjects = (req, res) => {
   SubjectModel.find({})
+  .populate('students')
+  .populate('teachers')
   .exec((error, Subjects) => {
     if(Subjects){
       res.status(200).json({ Subjects })
@@ -76,6 +78,8 @@ exports.fetchSubjects = (req, res) => {
 exports.fetchSubject = (req, res) => {
   if(req.params.title !== undefined){
     SubjectModel.find({title: req.params.title})
+    .populate('students')
+    .populate('teachers')
     .exec((error, Subjects) => {
       if(Subjects){
         res.status(200).json({Subjects})

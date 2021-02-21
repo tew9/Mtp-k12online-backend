@@ -83,12 +83,13 @@ exports.registerClass = (req, res) => {
 
 exports.fetchClasses = (req, res) => {
   ClassModel.find({})
+  .populate('subjects')
   .exec((error, classes) => {
     if(classes){
       res.status(200).json({classes})
     }
     else {
-      res.status(400).json({error})
+      res.status(400).json({error: error})
     }
   });
 }
@@ -97,6 +98,7 @@ exports.fetchClass = (req, res) => {
   if(req.params.title !== undefined)
   {
     ClassModel.find({title: req.params.title})
+    .populate('subjects')
     .exec((error, classes) => {
       if(classes){
         res.status(200).json({classes})
