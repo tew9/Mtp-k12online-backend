@@ -12,7 +12,7 @@ exports.updateSubject = (req, res) => {
     return res.status(400).json("Please specify the correct subject ID, and add it to params or contact admins/IT.")
   }
   var id = req.params._id;
-  const { timePeriod, teachers, students, level, approval } = req.body;
+  const { timePeriod, teachers, students, level, approval, description } = req.body;
   var updatedBy = req.user;
 
   var updateObject = {};
@@ -26,7 +26,7 @@ exports.updateSubject = (req, res) => {
 
   SubjectModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
     if(response != null) res.status(204).json({"Update": "updated succesfuly"});
-    else res.status(400).json({error: "There's no subject with specified ID, please enter the correct ID and try again."})
+    else res.status(400).json({error: err})
   }); 
 }
 

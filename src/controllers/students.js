@@ -7,15 +7,15 @@ const slugify = require('slugify');
 * @function Student-Controller
 **/
 
-exports.approveStudent = (req, res) => {
+exports.updateStudent = (req, res) => {
 
   if(!req.params._id){
     return res.status(400).json("Please specify the studentId and add it to params")
   }
   var id = req.params._id
   const { firstName, lastName, middleName, enrolledDate, location, state, level,
-          gender, email, cellPhone, city, county, country, zipCode } = req.body;
-
+          gender, email, cellPhone, city, county, country, zipCode, subjects, classes } = req.body;
+  
   var updateObject = {};
   firstName != null? updateObject.firstName = firstName: updateObject
   lastName != null? updateObject.lastName = lastName: updateObject
@@ -31,18 +31,20 @@ exports.approveStudent = (req, res) => {
   county != null? updateObject.county = county: updateObject
   country != null? updateObject.country = country: updateObject
   zipCode != null? updateObject.zipCode = zipCode: updateObject
+  subjects != null? updateObject.subjects = subjects: updateObject
+  classes != null? updateObject.classes = classes: updateObject
   updateObject.approval = true;
   updateObject.updatedBy = req.user;
 
   StudentModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
     if(response != null) res.status(204).json(response);
-    else res.status(400).json({err: "We can't find student with given ID, Please provide the correct ID"})
+    else res.status(400).json({error:err})
   });  
 }
 
 exports.registerStudent = (req, res) => {
   const { firstName, lastName, middleName,
-          gender, email, cellPhone, city, county, country, } = req.body;
+          gender, email, cellPhone, city, county, country,subjects, classes } = req.body;
   var { dob }  = req.body;
   dob = new Date(dob);
   enrolledDate = new Date()
@@ -63,7 +65,10 @@ exports.registerStudent = (req, res) => {
     country,
     county,
     dob,
+    subjects, 
+    classes,
     ID: studentId,
+    registeredBy: req.user,
     studentImage: studentImageUrl
   }
 
@@ -95,6 +100,8 @@ exports.registerStudent = (req, res) => {
 
 exports.fetchStudents = (req, res) => {
   StudentModel.find({})
+  .populate('subjects')
+  .populate('classes')
   .exec((error, students) => {
     if(students){
       res.status(200).json({students})
@@ -107,7 +114,9 @@ exports.fetchStudents = (req, res) => {
 
 exports.fetchStudent = (req, res) => {
   if(req.params._id !== undefined){
-    StudentModel.find({_id: req.params._id})
+    StudentModel.find({ID: req.params._id})
+    .populate('subjects')
+    .populate('classes')
     .exec((error, student) => {
       if(student){
         res.status(200).json({student})

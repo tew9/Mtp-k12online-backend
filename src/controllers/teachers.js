@@ -13,7 +13,7 @@ exports.updateTeacher = (req, res) => {
   }
   var id = req.params._id
   const { firstName, lastName, middleName, occupation, location, state, level,
-          gender, email, cellPhone, city, county, country, zipCode } = req.body;
+          gender, email, cellPhone, city, county, country, zipCode, subjects, classes  } = req.body;
 
   var updateObject = {};
   firstName != null? updateObject.firstName = firstName: updateObject
@@ -30,19 +30,21 @@ exports.updateTeacher = (req, res) => {
   county != null? updateObject.county = county: updateObject
   country != null? updateObject.country = country: updateObject
   zipCode != null? updateObject.zipCode = zipCode: updateObject
+  subjects != null? updateObject.subjects = subjects: updateObject
+  classes != null? updateObject.classes = classes: updateObject
   updateObject.approval = true;
   updateObject.updatedBy = req.user;
 
   TeacherModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
     if(response != null) res.status(204).json(response);
-    else res.status(400).json({err: "We can't find teacher with given ID, Please provide the correct ID"})
-  });  
+    else res.status(400).json({error: err})
+  });
 }
 
 exports.registerTeacher = (req, res) => {
   const {firstName, lastName, middleName, occupation, gender, email, cellPhone,
-         county, country, state, city, zipCode,   } = req.body;
-
+         county, country, state, city, zipCode, subjects, classes   } = req.body;
+  
   var { dob }  = req.body;
   dob = new Date(dob);
   const slug = slugify(`${firstName}${lastName}${dob}`)
@@ -65,6 +67,8 @@ exports.registerTeacher = (req, res) => {
     ID: teacherId,
     slug: slug,
     createdBy: req.user,
+    subjects, 
+    classes,
     profilePicture: ImageUrl
   }
 
@@ -96,6 +100,8 @@ exports.registerTeacher = (req, res) => {
 
 exports.fetchTeachers = (req, res) => {
   TeacherModel.find({})
+  .populate('subjects')
+  .populate('classes')
   .exec((error, teachers) => {
     if(teachers){
       res.status(200).json({teachers})
@@ -109,6 +115,8 @@ exports.fetchTeachers = (req, res) => {
 exports.fetchTeacher = (req, res) => {
   if(req.params._id !== undefined){
     TeacherModel.find({_id: req.params._id})
+    .populate('subjects')
+    .populate('classes')
     .exec((error, teacher) => {
       if(teacher){
         res.status(200).json({teacher})

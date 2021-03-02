@@ -7,7 +7,7 @@ const { fetchStudents,
         fetchStudent, 
         registerStudent, 
         deleteStudent,
-        approveStudent
+        updateStudent
       } = require('../controllers/students');
 const { requireSignin, adminTeacherMiddleware, adminMiddleware } = require('../common-ware');
 const { studentValidation, isRequestValidatedStudent } = require('../validators/studentValidator');
@@ -27,7 +27,7 @@ router.get('/students/get/:_id',  fetchStudent);
 router.get('/students/get', requireSignin, adminTeacherMiddleware, fetchStudents);
 router.post('/students/register', studentValidation, isRequestValidatedStudent,
                                  upload.single('studentPicture'), registerStudent);
-router.put('/students/update/:_id', requireSignin, adminTeacherMiddleware, approveStudent);
+router.put('/students/update/:_id', requireSignin, adminTeacherMiddleware, updateStudent);
 router.delete('/students/delete/:_id', requireSignin, adminMiddleware, deleteStudent);
 
 module.exports = router;
