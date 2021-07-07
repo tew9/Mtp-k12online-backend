@@ -33,7 +33,7 @@ exports.isRequestValidatedSignup = (req, res, next) => {
 
 exports.validateRequestSignin = [
   check('password')
-  .notEmpty().withMessage('Password is required')
+  .notEmpty().withMessage('Password is required'),
 ]
 
 exports.isRequestValidatedSignin = (req, res, next) => {

@@ -85,6 +85,12 @@ const StudentSchema = new mongoose.Schema({
     trim: true,
     minlength: 2,
   },
+  level: {
+    require: true,
+    type: Number,
+    trim: true,
+    minlength: 2,
+  },
   zipCode: {
     type: String,
     trim: true,
@@ -96,6 +102,9 @@ const StudentSchema = new mongoose.Schema({
   },
   studentImage: String,
   registeredBy: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}],
+  subjects: [{type: mongoose.Schema.Types.ObjectId, ref: 'Subjects' }],
+  classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Classes' }],
+  updatedBy: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
 }, {timestampts: true})
 
 StudentSchema.virtual('fullName')

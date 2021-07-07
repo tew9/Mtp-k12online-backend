@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 //create schema
 const classSchema = new mongoose.Schema({
-  ID: {type: String, required: true, unique: true},
+  slug: {type: String, required:true, unique:true},
+  ID: {type: String, required: true},
   title:{
     type: String,
     required: true,
@@ -11,19 +12,19 @@ const classSchema = new mongoose.Schema({
     max:30
   },
   subjects:{
-    type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Courses'}],
+    type: [{type: mongoose.Schema.Types.ObjectId, ref: 'Subjects'}],
     required: true,
     trim: true,
     min: 3,
     max: 20
   },
-  Description: {
-    type: string,
+  description: {
+    type: String,
     trim: true,
     minlength: 3,
   },
   capacity: {
-    type: Int16Array,
+    type: Number,
     trim: true,
     required: true
   },
@@ -33,7 +34,8 @@ const classSchema = new mongoose.Schema({
   }, 
   begins: Date,
   ends: Date,
-  createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
+  createdBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}],
+  updatedBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}]
 }, {timestampts: true})
 
 classSchema.virtual('name')

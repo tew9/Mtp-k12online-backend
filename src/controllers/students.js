@@ -7,23 +7,44 @@ const slugify = require('slugify');
 * @function Student-Controller
 **/
 
-exports.approveStudent = (req, res) => {
-  const {approval} = req.body;
-  var query = { approval: false};
-  if(approval){
-    var newValue = { $set: { approval: true } }
-    StudentModel.updateOne(query, newValue, function(err, response){
-      if(!response.result) res.status(500).json({"Update failed!!! ": err});
-      if(response.result) res.status(200).json(response.result.nModified)
-    });
+exports.updateStudent = (req, res) => {
+
+  if(!req.params._id){
+    return res.status(400).json("Please specify the studentId and add it to params")
   }
+  var id = req.params._id
+  const { firstName, lastName, middleName, enrolledDate, location, state, level,
+          gender, email, cellPhone, city, county, country, zipCode, subjects, classes } = req.body;
+  
+  var updateObject = {};
+  firstName != null? updateObject.firstName = firstName: updateObject
+  lastName != null? updateObject.lastName = lastName: updateObject
+  middleName != null? updateObject.middleName = middleName: updateObject
+  enrolledDate != null? updateObject.enrolledDate = new Date(enrolledDate): updateObject
+  location != null? updateObject.location = location: updateObject
+  state != null? updateObject.state = state: updateObject
+  level != null? updateObject.level = level: updateObject
+  gender != null? updateObject.gender = gender: updateObject
+  email != null? updateObject.email = email: updateObject
+  cellPhone != null? updateObject.cellPhone = cellPhone: updateObject
+  city != null? updateObject.city = city: updateObject
+  county != null? updateObject.county = county: updateObject
+  country != null? updateObject.country = country: updateObject
+  zipCode != null? updateObject.zipCode = zipCode: updateObject
+  subjects != null? updateObject.subjects = subjects: updateObject
+  classes != null? updateObject.classes = classes: updateObject
+  updateObject.approval = true;
+  updateObject.updatedBy = req.user;
+
+  StudentModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
+    if(response != null) res.status(204).json(response);
+    else res.status(400).json({error:err})
+  });  
 }
 
 exports.registerStudent = (req, res) => {
-
   const { firstName, lastName, middleName,
-          gender, email, cellPhone, city, county, country, } = req.body;
-
+          gender, email, cellPhone, city, county, country,subjects, classes } = req.body;
   var { dob }  = req.body;
   dob = new Date(dob);
   enrolledDate = new Date()
@@ -44,7 +65,10 @@ exports.registerStudent = (req, res) => {
     country,
     county,
     dob,
+    subjects, 
+    classes,
     ID: studentId,
+    registeredBy: req.user,
     studentImage: studentImageUrl
   }
 
@@ -76,6 +100,8 @@ exports.registerStudent = (req, res) => {
 
 exports.fetchStudents = (req, res) => {
   StudentModel.find({})
+  .populate('subjects')
+  .populate('classes')
   .exec((error, students) => {
     if(students){
       res.status(200).json({students})
@@ -87,11 +113,13 @@ exports.fetchStudents = (req, res) => {
 }
 
 exports.fetchStudent = (req, res) => {
-  if(req.params.fullName !== undefined){
-    StudentModel.find({slug: req.params.fullName.replace(/ /g,"-")})
-    .exec((error, students) => {
-      if(students){
-        res.status(200).json({students})
+  if(req.params._id !== undefined){
+    StudentModel.find({ID: req.params._id})
+    .populate('subjects')
+    .populate('classes')
+    .exec((error, student) => {
+      if(student){
+        res.status(200).json({student})
       }
       else {
         res.status(400).json({error})
@@ -101,25 +129,19 @@ exports.fetchStudent = (req, res) => {
   else{
     res.status(400).json("Bad Requests, provide your full name")
   }
-  
 }
 
 exports.deleteStudent = (req, res) => {
-  StudentModel.findOne({_id: req.params._id})
-  .exec((err, student) => {
-    if(student){
-      StudentModel.deleteOne({_id: student._id})
-      .exec((error, response) => {
-        if(response) {
-          res.status(200).json({response: {"student": student, "deleted":"true"}})
-        }
-        else {
-          res.status(400).json({error})
-        }
-      });
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct student ID, and add it to params or contact admins/IT.")
+  }
+  StudentModel.findOneAndDelete({ID: req.params._id})
+  .exec((error, response) => {
+    if(response) {
+      res.status(200).json({response: response, deleted:"true"})
     }
-    else{
-        res.status(400).json(`Bad request, No student exist with that ID! error: ${err}`)
+    else {
+      res.status(400).json(`Bad request, No student exist with that ID! error`)
     }
-  })
+  });
 }

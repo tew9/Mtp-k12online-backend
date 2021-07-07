@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 //create schema
 const TeacherSchema = new mongoose.Schema({
   slug: {type: String, required: true, unique: true},
+  ID: {type: String, required: true},
   firstName:{
     type: String,
     required: true,
@@ -96,6 +97,10 @@ const TeacherSchema = new mongoose.Schema({
     trim: true,
     required: true
   },
+  registeredBy: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users', required:true}],
+  subjects: [{type: mongoose.Schema.Types.ObjectId, ref: 'Subjects' }],
+  classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Classes' }],
+  updatedBy: [{type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
   profilePicture: {type: String},
 }, {timestampts: true})
 

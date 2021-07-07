@@ -7,6 +7,7 @@ const { fetchTeachers,
         fetchTeacher,
         registerTeacher,
         deleteTeacher,
+        updateTeacher,
       } = require('../controllers/teachers');
 const { requireSignin, adminTeacherMiddleware, adminMiddleware } = require('../common-ware');
 const { teacherValidation, isRequestValidatedTeacher } = require('../validators/teacherValidator');
@@ -22,10 +23,10 @@ const storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-// router.get('/teacher/get/:lastName',  fetchStudent);
-router.get('/teacher/get', requireSignin, adminTeacherMiddleware, fetchTeachers);
-router.post('/teacher/register', teacherValidation, isRequestValidatedTeacher, upload.single('teacherPicture'), registerTeacher);
-//router.put('/teacher/approval', requireSignin, adminMiddleware, approveStudent);
-router.delete('/teacher/delete/:_id', requireSignin, adminMiddleware, deleteTeacher);
+router.get('/teachers/get/:_id',  fetchTeacher);
+router.get('/teachers/get', requireSignin, adminTeacherMiddleware, fetchTeachers);
+router.post('/teachers/register', teacherValidation, isRequestValidatedTeacher, upload.single('teacherPicture'), registerTeacher);
+router.put('/teachers/update/:_id', requireSignin, adminTeacherMiddleware, updateTeacher);
+router.delete('/teachers/delete/:_id', requireSignin, adminMiddleware, deleteTeacher);
 
 module.exports = router;

@@ -1,67 +1,107 @@
-const studentModel =  require('../models/students');
+const ClassModel =  require('../models/classes');
 const slugify = require('slugify');
+const ID = require("nodejs-unique-numeric-id-generator")
 
 /**
 * @author
-* @function Student-Controller
+* @function Class-Controller
 **/
 
-exports.approveStudent = (req, res) => {
-  const {approval} = req.body;
-  var query = { approval: false};
-  if(approval){
-    var newValue = { $set: { approval: true } }
-    console.log(newValue)
-    studentModel.updateOne(query, newValue, function(err, response){
-      if(!response.result) res.status(500).json({"Update failed!!! ": err});
-      if(response.result) res.status(200).json(response.result.nModified)
-    });
+exports.updateClass = (req, res) => {
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct class ID, and add it to params, or contact admin/IT")
   }
+
+  var id = req.params._id;
+  const { begins, ends, subjects, description,
+          capacity, facilities
+  } = req.body;
+  var beginsOn = null;
+  var endsOn = null
+  if(begins != null && ends != null){
+    beginsOn =  new Date(begins)
+    endsOn = new Date(ends)
+  }
+  var updateObject = {};
+  subjects != null? updateObject.subjects = subjects: updateObject
+  begins != null? updateObject.begins = beginsOn: updateObject
+  ends != null? updateObject.ends = endsOn: updateObject
+  description != null? updateObject.description = description: updateObject
+  capacity != null? updateObject.capacity = capacity: updateObject
+  facilities != null? updateObject.facilities = facilities: updateObject
+  updateObject.updatedBy = req.user;
+ 
+  ClassModel.findOneAndUpdate({ID: id}, updateObject, {new: true}, function(err, response) {
+    if(response != null) res.status(204).json({"Update": "updated succesfuly"});
+    else res.status(400).json({error: "There's no class with specified ID, please enter the correct ID and try again."})
+  });  
 }
 
 exports.registerClass = (req, res) => {
-  const {title, subjects, capacity, facilities, begins, ends } = req.body;
-  let studentImageUrl
-  const studentObject = {
+  const {title, subjects, capacity, facilities, begins, ends, description } = req.body;
+  var beginsOn = null
+  var endsOn = null
+  if(begins != null && ends != null){
+    beginsOn = new Date(begins);
+    endsOn = new Date(ends)
+  }
+  var createdBy = req.user;
+  var slug = slugify(`${title}${capacity}`, '_');
+  var classId = ID.generate(new Date().toJSON());
+  let classImageUrl
+  const classObject = {
+    ID: classId,
     title,
+    description,
+    createdBy,
     subjects,
     capacity,
     facilities,
-    begins,
-    phoneNumber,
-    slug: slugify(`${firstName} ${middleName} ${lastName}`),
-    studentImage: studentImageUrl
+    begins: beginsOn,
+    ends: endsOn,
+    slug: slug,
+    classImage: classImageUrl
   }
 
   if(req.file){
-    studentObject.studentImage = process.env.API+'/public/'+req.file.filename
+    classObject.classImage = process.env.API+'/public/'+req.file.filename
   }
 
-  const student = new studentModel(studentObject);
-  student.save((error, students)=>{
-    error? res.status(400).json({error: error})
-    : res.status(201).json({ students })
+  ClassModel.findOne({slug: slug})
+  .exec((err, cl) => {
+    if(!cl){
+      const Class = new ClassModel(classObject);
+      Class.save((error, classs)=>{
+        error? res.status(400).json({error: error})
+        : res.status(201).json({ classs })
+      });
+    }else{
+      res.status(409).json({"error": "This class is already registered, check the inputs and try again."})
+    }
   });
 }
 
-exports.fetchStudents = (req, res) => {
-  studentModel.find({})
-  .exec((error, students) => {
-    if(students){
-      res.status(200).json({students})
+exports.fetchClasses = (req, res) => {
+  ClassModel.find({})
+  .populate('subjects')
+  .exec((error, classes) => {
+    if(classes){
+      res.status(200).json({classes})
     }
     else {
-      res.status(400).json({error})
+      res.status(400).json({error: error})
     }
   });
 }
 
-exports.fetchStudent = (req, res) => {
-  if(req.params.fullName !== undefined){
-    studentModel.find({slug: req.params.fullName.replace(/ /g,"-")})
-    .exec((error, students) => {
-      if(students){
-        res.status(200).json({students})
+exports.fetchClass = (req, res) => {
+  if(req.params.title !== undefined)
+  {
+    ClassModel.find({title: req.params.title})
+    .populate('subjects')
+    .exec((error, classes) => {
+      if(classes){
+        res.status(200).json({classes})
       }
       else {
         res.status(400).json({error})
@@ -69,27 +109,21 @@ exports.fetchStudent = (req, res) => {
     });
   }
   else{
-    res.status(400).json("Bad Requests, provide your full name")
+      res.status(400).json("Bad Requests, Pleas, provide correct class title");
   }
-  
 }
 
-exports.deleteStudent = (req, res) => {
-  studentModel.findOne({_id: req.params._id})
-  .exec((err, student) => {
-    if(student){
-      studentModel.deleteOne({_id: student._id})
-      .exec((error, response) => {
-        if(response) {
-          res.status(200).json({response: {"deleted":"true"}})
-        }
-        else {
-          res.status(400).json({error})
-        }
-      });
+exports.deleteClass = (req, res) => {
+  if(!req.params._id){
+    return res.status(400).json("Please specify the correct class ID, and add it to params or contact admins/IT.")
+  }
+  ClassModel.findOneAndDelete({ID: req.params._id})
+  .exec((error, response) => {
+    if(response) {
+      res.status(200).json({response: response, deleted:"true"})
     }
-    else{
-        res.status(400).json(`Bad request, No student exist with that ID! error: ${err}`)
+    else {
+      res.status(400).json(`Bad request, No class exist with that ID! error`)
     }
-  })
+  });
 }
