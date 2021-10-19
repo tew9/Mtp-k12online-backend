@@ -1,0 +1,16 @@
+#workflow name
+name: learn-github-actions
+#Trigger
+on: [push]
+#jobs (groups steps)
+jobs: 
+  check-bats-version: 
+    runs-on: ubuntu-latest
+    #task that runs on the same runners, group commands and scripts
+    steps:
+      - uses: actions/checkout@v2
+      - uses: action/setup-node@v2
+        with: 
+          node-version: '14'
+      - run: npm install -g bats
+      - run: bats -v
